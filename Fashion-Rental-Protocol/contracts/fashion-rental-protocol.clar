@@ -67,15 +67,16 @@
         (daily-rate (get daily-rate item))
         (security-deposit (get security-deposit item))
         (total-cost (+ (* daily-rate rental-days) security-deposit))
-        (rental-id (var-get next-rental-id)))
+        (rental-id (var-get next-rental-id))
+        (current-block stacks-block-height))
     (asserts! (get available item) ERR-ITEM-UNAVAILABLE)
     (try! (stx-transfer? total-cost tx-sender (as-contract tx-sender)))
     (map-set rental-agreements rental-id {
       item-id: item-id,
       renter: tx-sender,
       owner: (get owner item),
-      start-time: block-height,
-      end-time: (+ block-height (* rental-days u144)),
+      start-time: current-block,
+      end-time: (+ current-block (* rental-days u144)),
       total-cost: total-cost,
       security-deposit: security-deposit,
       status: "active",
